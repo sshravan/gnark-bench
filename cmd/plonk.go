@@ -69,6 +69,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 			RunTime:             took.Milliseconds(),
 			MaxRAM:              (m.Sys / 1024 / 1024),
 			Throughput:          int(float64(ccs.GetNbConstraints()) / took.Seconds()),
+			Count:               *fCount,
 		}
 
 		if err := w.Write(bData.values()); err != nil {
