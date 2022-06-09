@@ -69,5 +69,6 @@ func (bData benchData) values() []string {
 		fmt.Sprintf("%v", CPU.Supports(ADX) && CPU.Supports(BMI2)),
 		CPU.BrandName,
 		fmt.Sprintf("%v", amd64_adx),
+		strconv.Itoa(int(bData.Count)),
 	}
 }
