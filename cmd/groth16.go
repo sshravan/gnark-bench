@@ -19,7 +19,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/consensys/gnark/backend/groth16"
@@ -37,6 +36,8 @@ var groth16Cmd = &cobra.Command{
 }
 
 func runGroth16(cmd *cobra.Command, args []string) {
+
+	backend := "groth16"
 	if err := parseFlags(); err != nil {
 		fmt.Println("error: ", err.Error())
 		cmd.Help()
@@ -45,37 +46,6 @@ func runGroth16(cmd *cobra.Command, args []string) {
 
 	// write to stdout
 	w := csv.NewWriter(os.Stdout)
-	if err := w.Write(benchData{}.headers()); err != nil {
-		fmt.Println("error: ", err.Error())
-		os.Exit(-1)
-	}
-
-	writeResults := func(took time.Duration, ccs frontend.CompiledConstraintSystem) {
-		// check memory usage, max ram requested from OS
-		var m runtime.MemStats
-		runtime.ReadMemStats(&m)
-
-		internal, secret, public := ccs.GetNbVariables()
-		bData := benchData{
-			Backend:             "groth16",
-			Curve:               curveID.String(),
-			Algorithm:           *fAlgo,
-			NbCoefficients:      ccs.GetNbCoefficients(),
-			NbConstraints:       ccs.GetNbConstraints(),
-			NbInternalVariables: internal,
-			NbSecretVariables:   secret,
-			NbPublicVariables:   public,
-			RunTime:             took.Milliseconds(),
-			MaxRAM:              (m.Sys / 1024 / 1024),
-			Throughput:          int(float64(ccs.GetNbConstraints()) / took.Seconds()),
-			Count:               *fCount,
-		}
-
-		if err := w.Write(bData.values()); err != nil {
-			panic(err)
-		}
-		w.Flush()
-	}
 
 	var (
 		start time.Time
@@ -107,7 +77,7 @@ func runGroth16(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(took, ccs)
+		writeResults(backend, w, took, ccs)
 		return
 	}
 
@@ -122,7 +92,7 @@ func runGroth16(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(took, ccs)
+		writeResults(backend, w, took, ccs)
 		return
 	}
 
@@ -138,7 +108,7 @@ func runGroth16(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(took, ccs)
+		writeResults(backend, w, took, ccs)
 		return
 	}
 
@@ -159,7 +129,7 @@ func runGroth16(cmd *cobra.Command, args []string) {
 	}
 	stopProfile()
 	assertNoError(err)
-	writeResults(took, ccs)
+	writeResults(backend, w, took, ccs)
 
 }
 

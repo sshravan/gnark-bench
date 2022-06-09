@@ -19,7 +19,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/consensys/gnark/backend/plonk"
@@ -38,6 +37,8 @@ var plonkCmd = &cobra.Command{
 }
 
 func runPlonk(cmd *cobra.Command, args []string) {
+
+	backend := "plonk"
 	if err := parseFlags(); err != nil {
 		fmt.Println("error: ", err.Error())
 		cmd.Help()
@@ -46,37 +47,6 @@ func runPlonk(cmd *cobra.Command, args []string) {
 
 	// write to stdout
 	w := csv.NewWriter(os.Stdout)
-	if err := w.Write(benchData{}.headers()); err != nil {
-		fmt.Println("error: ", err.Error())
-		os.Exit(-1)
-	}
-
-	writeResults := func(took time.Duration, ccs frontend.CompiledConstraintSystem) {
-		// check memory usage, max ram requested from OS
-		var m runtime.MemStats
-		runtime.ReadMemStats(&m)
-
-		internal, secret, public := ccs.GetNbVariables()
-		bData := benchData{
-			Backend:             "plonk",
-			Curve:               curveID.String(),
-			Algorithm:           *fAlgo,
-			NbCoefficients:      ccs.GetNbCoefficients(),
-			NbConstraints:       ccs.GetNbConstraints(),
-			NbInternalVariables: internal,
-			NbSecretVariables:   secret,
-			NbPublicVariables:   public,
-			RunTime:             took.Milliseconds(),
-			MaxRAM:              (m.Sys / 1024 / 1024),
-			Throughput:          int(float64(ccs.GetNbConstraints()) / took.Seconds()),
-			Count:               *fCount,
-		}
-
-		if err := w.Write(bData.values()); err != nil {
-			panic(err)
-		}
-		w.Flush()
-	}
 
 	var (
 		start time.Time
@@ -108,7 +78,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(took, ccs)
+		writeResults(backend, w, took, ccs)
 		return
 	}
 
@@ -127,7 +97,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(took, ccs)
+		writeResults(backend, w, took, ccs)
 		return
 	}
 
@@ -143,7 +113,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(took, ccs)
+		writeResults(backend, w, took, ccs)
 		return
 	}
 
@@ -163,7 +133,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 	}
 	stopProfile()
 	assertNoError(err)
-	writeResults(took, ccs)
+	writeResults(backend, w, took, ccs)
 
 }
 
