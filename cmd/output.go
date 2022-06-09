@@ -38,7 +38,7 @@ type benchData struct {
 }
 
 func (bData benchData) headers() []string {
-	return []string{"backend", "curve", "algorithm", "nbConstraints", "nbInternal", "nbSecret", "nbPublic", "nbCoefficients", "ram(mb)", "time(ms)", "throughput(constraints/s)", "througputPerCore(constraints/s)", "nbPhysicalCores", "nbThreadsPerCore", "nbLogicalCores", "cacheLine", "l1d", "l1i", "l2", "l3", "freq", "adx", "cpu", "amd64_adx"}
+	return []string{"backend", "curve", "algorithm", "nbConstraints", "nbInternal", "nbSecret", "nbPublic", "nbCoefficients", "ram(mb)", "time(ms)", "throughput(constraints/s)", "throughputPerCore(constraints/s)", "nbPhysicalCores", "nbThreadsPerCore", "nbLogicalCores", "cacheLine", "l1d", "l1i", "l2", "l3", "freq", "adx", "cpu", "amd64_adx"}
 }
 func (bData benchData) values() []string {
 
