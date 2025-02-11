@@ -7,10 +7,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/consensys/gnark/frontend"
+	"github.com/consensys/gnark/constraint"
 )
 
-func writeResults(backend string, w *csv.Writer, took time.Duration, ccs frontend.CompiledConstraintSystem, proofSize int) {
+func writeResults(backend string, w *csv.Writer, took time.Duration, ccs constraint.ConstraintSystem, proofSize int) {
 	if err := w.Write(benchData{}.headers()); err != nil {
 		fmt.Println("error: ", err.Error())
 		os.Exit(-1)

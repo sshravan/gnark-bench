@@ -16,7 +16,7 @@ var BenchCircuits map[string]BenchCircuit
 
 type BenchCircuit interface {
 	Circuit(size int) frontend.Circuit
-	Witness(size int, curveID ecc.ID) *witness.Witness
+	Witness(size int, curveID ecc.ID) witness.Witness
 }
 
 func init() {
@@ -31,7 +31,7 @@ func (d *defaultCircuit) Circuit(size int) frontend.Circuit {
 	return &benchCircuit{n: size}
 }
 
-func (d *defaultCircuit) Witness(size int, curveID ecc.ID) *witness.Witness {
+func (d *defaultCircuit) Witness(size int, curveID ecc.ID) witness.Witness {
 	witness := benchCircuit{n: size}
 
 	witness.X = (2)

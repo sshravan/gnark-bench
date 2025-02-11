@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/consensys/gnark/backend/groth16"
+	"github.com/consensys/gnark/constraint"
 	"github.com/consensys/gnark/frontend"
 	"github.com/consensys/gnark/frontend/cs/r1cs"
 	"github.com/pkg/profile"
@@ -85,7 +86,7 @@ func runGroth16(cmd *cobra.Command, args []string) {
 	if *fAlgo == "compile" {
 		startProfile()
 		var err error
-		var ccs frontend.CompiledConstraintSystem
+		var ccs constraint.ConstraintSystem
 		for i := 0; i < *fCount; i++ {
 			ccs, err = frontend.Compile(curveID.ScalarField(), r1cs.NewBuilder, c.Circuit(*fCircuitSize), frontend.WithCapacity(*fCircuitSize))
 		}
