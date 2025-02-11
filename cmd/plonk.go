@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -34,6 +35,19 @@ var plonkCmd = &cobra.Command{
 	Use:   "plonk",
 	Short: "runs benchmarks and profiles using PlonK proof system",
 	Run:   runPlonk,
+}
+
+func plonkProofSize(proof plonk.Proof) int {
+	var buf bytes.Buffer
+
+	// Write the proof to the buffer using WriteRawTo
+	bytesWritten, err := proof.WriteTo(&buf)
+	if err != nil {
+		fmt.Println("Error writing proof:", err)
+		return 0
+	}
+
+	return int(bytesWritten)
 }
 
 func runPlonk(cmd *cobra.Command, args []string) {
@@ -78,7 +92,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(backend, w, took, ccs)
+		writeResults(backend, w, took, ccs, -1)
 		return
 	}
 
@@ -97,7 +111,7 @@ func runPlonk(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(backend, w, took, ccs)
+		writeResults(backend, w, took, ccs, -1)
 		return
 	}
 
@@ -106,14 +120,15 @@ func runPlonk(cmd *cobra.Command, args []string) {
 	assertNoError(err)
 
 	if *fAlgo == "prove" {
-
+		var proof plonk.Proof
 		startProfile()
 		for i := 0; i < *fCount; i++ {
-			_, err = plonk.Prove(ccs, pk, witness)
+			proof, err = plonk.Prove(ccs, pk, witness)
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(backend, w, took, ccs)
+		proofSize := plonkProofSize(proof)
+		writeResults(backend, w, took, ccs, proofSize)
 		return
 	}
 
@@ -133,7 +148,8 @@ func runPlonk(cmd *cobra.Command, args []string) {
 	}
 	stopProfile()
 	assertNoError(err)
-	writeResults(backend, w, took, ccs)
+	proofSize := plonkProofSize(proof)
+	writeResults(backend, w, took, ccs, proofSize)
 
 }
 

@@ -23,6 +23,7 @@ type benchData struct {
 	RunTime             int64
 	Throughput          int
 	Count               int
+	ProofSize           int
 
 	// CPU info
 	// NbPhysicalCores int
@@ -39,7 +40,7 @@ type benchData struct {
 }
 
 func (bData benchData) headers() []string {
-	return []string{"backend", "curve", "algorithm", "nbConstraints", "nbInternal", "nbSecret", "nbPublic", "nbCoefficients", "ram(MiB)", "time(ms)", "throughput(constraints/s)", "throughputPerCore(constraints/s)", "nbPhysicalCores", "nbThreadsPerCore", "nbLogicalCores", "cacheLine", "l1d", "l1i", "l2", "l3", "freq", "adx", "cpu", "amd64_adx", "count"}
+	return []string{"backend", "curve", "algorithm", "nbConstraints", "nbInternal", "nbSecret", "nbPublic", "nbCoefficients", "ram(MiB)", "time(ms)", "throughput(constraints/s)", "throughputPerCore(constraints/s)", "nbPhysicalCores", "nbThreadsPerCore", "nbLogicalCores", "cacheLine", "l1d", "l1i", "l2", "l3", "freq", "adx", "cpu", "amd64_adx", "count", "proofSize(Bytes)"}
 }
 func (bData benchData) values() []string {
 
@@ -70,5 +71,6 @@ func (bData benchData) values() []string {
 		CPU.BrandName,
 		fmt.Sprintf("%v", amd64_adx),
 		strconv.Itoa(int(bData.Count)),
+		strconv.Itoa(int(bData.ProofSize)),
 	}
 }

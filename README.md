@@ -1,8 +1,8 @@
 # gnark-bench
 
-Command line tool to benchmark and profile execution of `plonk` and `groth16` zkSNARKs with `gnark`. 
+Command line tool to benchmark and profile execution of `plonk` and `groth16` zkSNARKs with `gnark`.
 
-If running benchmarks on a `amd64` machine with `adx` instructions, be sure to build `gnark-bench` with `-tags=amd64_adx`. 
+If running benchmarks on a `amd64` machine with `adx` instructions, be sure to build `gnark-bench` with `-tags=amd64_adx`.
 
 ## Usage
 
@@ -35,4 +35,5 @@ Flags:
 
 
 ## Notes
-* It is possible to benchmark a specific circuit, need to fork and extend `circuit` subpackage with a struct that implements `BenchCircuit` and register it in the global map. 
+* It is possible to benchmark a specific circuit, need to fork and extend `circuit` subpackage with a struct that implements `BenchCircuit` and register it in the global map.
+* Run the prove or verify algorithm to compute the proof size.

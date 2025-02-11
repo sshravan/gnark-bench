@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -33,6 +34,19 @@ var groth16Cmd = &cobra.Command{
 	Use:   "groth16",
 	Short: "runs benchmarks and profiles using Groth16 proof system",
 	Run:   runGroth16,
+}
+
+func groth16ProofSize(proof groth16.Proof) int {
+	var buf bytes.Buffer
+
+	// Write the proof to the buffer using WriteRawTo
+	bytesWritten, err := proof.WriteTo(&buf)
+	if err != nil {
+		fmt.Println("Error writing proof:", err)
+		return 0
+	}
+
+	return int(bytesWritten)
 }
 
 func runGroth16(cmd *cobra.Command, args []string) {
@@ -77,7 +91,7 @@ func runGroth16(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(backend, w, took, ccs)
+		writeResults(backend, w, took, ccs, -1)
 		return
 	}
 
@@ -92,23 +106,25 @@ func runGroth16(cmd *cobra.Command, args []string) {
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(backend, w, took, ccs)
+		writeResults(backend, w, took, ccs, -1)
 		return
 	}
 
 	witness := c.Witness(*fCircuitSize, curveID)
 
 	if *fAlgo == "prove" {
+		var proof groth16.Proof
 		pk, err := groth16.DummySetup(ccs)
 		assertNoError(err)
 
 		startProfile()
 		for i := 0; i < *fCount; i++ {
-			_, err = groth16.Prove(ccs, pk, witness)
+			proof, err = groth16.Prove(ccs, pk, witness)
 		}
 		stopProfile()
 		assertNoError(err)
-		writeResults(backend, w, took, ccs)
+		proofSize := groth16ProofSize(proof)
+		writeResults(backend, w, took, ccs, proofSize)
 		return
 	}
 
@@ -129,7 +145,8 @@ func runGroth16(cmd *cobra.Command, args []string) {
 	}
 	stopProfile()
 	assertNoError(err)
-	writeResults(backend, w, took, ccs)
+	proofSize := groth16ProofSize(proof)
+	writeResults(backend, w, took, ccs, proofSize)
 
 }
 

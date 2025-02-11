@@ -10,7 +10,7 @@ import (
 	"github.com/consensys/gnark/frontend"
 )
 
-func writeResults(backend string, w *csv.Writer, took time.Duration, ccs frontend.CompiledConstraintSystem) {
+func writeResults(backend string, w *csv.Writer, took time.Duration, ccs frontend.CompiledConstraintSystem, proofSize int) {
 	if err := w.Write(benchData{}.headers()); err != nil {
 		fmt.Println("error: ", err.Error())
 		os.Exit(-1)
@@ -34,6 +34,7 @@ func writeResults(backend string, w *csv.Writer, took time.Duration, ccs fronten
 		MaxRAM:              (m.Sys / 1024 / 1024),
 		Throughput:          int(float64(ccs.GetNbConstraints()) / took.Seconds()),
 		Count:               *fCount,
+		ProofSize:           proofSize,
 	}
 
 	if err := w.Write(bData.values()); err != nil {
